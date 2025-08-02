@@ -1,0 +1,104 @@
+.file-upload {
+  margin-bottom: 2rem;
+}
+
+.file-upload .ant-upload-drag {
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  background: #fafafa;
+  transition: all 0.3s ease;
+  padding: 2rem;
+}
+
+.file-upload .ant-upload-drag:hover {
+  border-color: #1890ff;
+  background: #f0f8ff;
+}
+
+.file-upload .ant-upload-drag.ant-upload-drag-hover {
+  border-color: #1890ff;
+  background: #e6f7ff;
+}
+
+.file-upload .ant-upload-drag-icon {
+  font-size: 3rem;
+  color: #1890ff;
+  margin-bottom: 1rem;
+}
+
+.file-upload .ant-upload-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.file-upload .ant-upload-hint {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.upload-icon {
+  margin-top: 1rem;
+  font-size: 2rem;
+  color: #d9d9d9;
+}
+
+.upload-progress {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.progress-item {
+  margin-bottom: 0.5rem;
+}
+
+.progress-item:last-child {
+  margin-bottom: 0;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.upload-status {
+  margin-top: 1rem;
+  text-align: center;
+  padding: 1rem;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 6px;
+  color: #1890ff;
+}
+
+.upload-status p {
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .file-upload .ant-upload-drag {
+    padding: 1.5rem;
+  }
+  
+  .file-upload .ant-upload-drag-icon {
+    font-size: 2.5rem;
+  }
+  
+  .file-upload .ant-upload-text {
+    font-size: 1.1rem;
+  }
+  
+  .file-upload .ant-upload-hint {
+    font-size: 0.8rem;
+  }
+} 

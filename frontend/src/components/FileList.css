@@ -1,0 +1,156 @@
+.file-list {
+  margin-top: 24px;
+}
+
+.file-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.file-list-info {
+  flex: 1;
+}
+
+.file-list-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.file-table {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-table .ant-table-thead > tr > th {
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 600;
+}
+
+.file-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 16px;
+}
+
+.file-table .ant-table-tbody > tr:hover > td {
+  background: #f5f5f5;
+}
+
+.file-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-icon {
+  font-size: 20px;
+  color: #1890ff;
+  flex-shrink: 0;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.file-meta .ant-typography {
+  font-size: 12px;
+}
+
+/* 转换进度模态框样式 */
+.conversion-progress {
+  padding: 16px 0;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.progress-complete,
+.progress-error {
+  margin-top: 16px;
+  text-align: center;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.progress-complete {
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.progress-error {
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+/* 状态标签样式 */
+.ant-tag {
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 2px 8px;
+  height: 20px;
+  line-height: 16px;
+}
+
+/* 按钮样式 */
+.ant-btn-sm {
+  height: 28px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+/* 复选框样式 */
+.ant-checkbox-wrapper {
+  font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .file-list-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .file-list-actions {
+    justify-content: center;
+  }
+  
+  .file-name-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .file-meta {
+    flex-wrap: wrap;
+  }
+} 
