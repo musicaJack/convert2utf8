@@ -31,12 +31,13 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 RUN addgroup -g 1002 -S appuser && \
     adduser -S appuser -u 1002 -G appuser
 
-# 设置权限
+# 设置权限（但保持Nginx以root用户运行）
 RUN chown -R appuser:appuser /usr/share/nginx/html && \
-    chmod -R 755 /usr/share/nginx/html
-
-# 切换到非root用户
-USER appuser
+    chmod -R 755 /usr/share/nginx/html && \
+    # 确保Nginx缓存目录存在且有正确权限
+    mkdir -p /var/cache/nginx /var/run /var/log/nginx && \
+    chown -R root:root /var/cache/nginx /var/run /var/log/nginx && \
+    chmod -R 755 /var/cache/nginx /var/run /var/log/nginx
 
 # 暴露端口
 EXPOSE 80
@@ -45,5 +46,5 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
 
-# 启动Nginx
+# 启动Nginx（以root用户运行）
 CMD ["nginx", "-g", "daemon off;"] 
