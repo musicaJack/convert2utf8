@@ -121,10 +121,12 @@ health_check() {
     fi
     
     # 检查前端健康端点
+    echo "检查前端容器健康状态..."
     if curl -f http://localhost:3000/health > /dev/null 2>&1; then
-        log_success "前端健康检查通过"
+        echo "✅ 前端容器健康检查通过"
     else
-        log_warning "前端健康检查失败，请手动检查"
+        echo "❌ 前端容器健康检查失败"
+        exit 1
     fi
     
     # 检查后端API健康端点

@@ -69,22 +69,15 @@ log_info "启动前端容器进行测试..."
 docker-compose up -d frontend
 
 # 等待容器启动
+echo "等待前端容器启动..."
 sleep 10
 
-# 检查容器状态
-if docker-compose ps | grep -q "convert2utf8-frontend.*Up"; then
-    log_success "前端容器启动成功"
-    
-    # 健康检查
-    if curl -f http://localhost:3000/health > /dev/null 2>&1; then
-        log_success "前端健康检查通过"
-    else
-        log_warning "前端健康检查失败，请检查容器日志"
-        docker-compose logs frontend
-    fi
+# 检查健康状态
+echo "检查前端容器健康状态..."
+if curl -f http://localhost:3000/health > /dev/null 2>&1; then
+    echo "✅ 前端容器构建并启动成功"
 else
-    echo "错误: 前端容器启动失败"
-    docker-compose logs frontend
+    echo "❌ 前端容器健康检查失败"
     exit 1
 fi
 
