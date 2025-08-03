@@ -21,9 +21,9 @@ RUN npm run build
 # 生产阶段
 FROM node:18-alpine AS production
 
-# 创建非root用户
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+# 创建非root用户和组（匹配诊断中的 gid 996）
+RUN addgroup -g 996 -S nodejs && \
+    adduser -S nodejs -u 1001 -G nodejs  # uid 1001, gid 996，确保一致
 
 WORKDIR /app
 
@@ -40,10 +40,10 @@ RUN npm ci --only=production && npm cache clean --force
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/src ./src
 
-# 创建必要的目录并设置权限
+# 创建必要的目录并设置权限（修复权限问题）
 RUN mkdir -p uploads converted logs && \
     chown -R nodejs:nodejs uploads converted logs && \
-    chmod -R 775 uploads converted logs  # 修复：显式设置775权限，确保可写
+    chmod -R 775 uploads converted logs  # 确保 group writable
 
 # 切换到非root用户
 USER nodejs
@@ -56,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD node -e "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # 启动命令
-CMD ["node", "dist/server.js"] 
+CMD ["node", "dist/server.js"]
