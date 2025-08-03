@@ -1,5 +1,6 @@
 {
   "name": "convert2utf8-frontend",
+  "homepage": "/convert/",
   "version": "1.0.0",
   "description": "文件编码转换工具前端",
   "private": true,
