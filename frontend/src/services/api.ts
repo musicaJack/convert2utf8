@@ -10,7 +10,7 @@ import {
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: '/convert/api',  // 修复：改为 '/convert/api' 以匹配代理路径（原为 '/api'）
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
