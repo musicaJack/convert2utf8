@@ -3,8 +3,8 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: ../frontend
-      dockerfile: ../docker/Dockerfile.frontend
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
       target: production
     container_name: convert2utf8-frontend
     ports:
