@@ -40,9 +40,10 @@ RUN npm ci --only=production && npm cache clean --force
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/src ./src
 
-# 创建必要的目录
+# 创建必要的目录并设置权限
 RUN mkdir -p uploads converted logs && \
-    chown -R nodejs:nodejs uploads converted logs
+    chown -R nodejs:nodejs uploads converted logs && \
+    chmod -R 775 uploads converted logs  # 修复：显式设置775权限，确保可写
 
 # 切换到非root用户
 USER nodejs

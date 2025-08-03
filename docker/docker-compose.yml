@@ -51,7 +51,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 40s  # 优化：确保容器有足够时间启动
     depends_on: []
 
 networks:

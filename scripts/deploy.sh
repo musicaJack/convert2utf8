@@ -57,6 +57,27 @@ check_network() {
     fi
 }
 
+# 准备挂载目录（修复：自动创建目录并设置权限）
+prepare_directories() {
+    log_info "准备后端挂载目录..."
+    
+    # 定义目录路径
+    UPLOAD_DIR="../backend/uploads"
+    CONVERTED_DIR="../backend/converted"
+    
+    # 创建目录如果不存在
+    mkdir -p $UPLOAD_DIR
+    mkdir -p $CONVERTED_DIR
+    
+    # 设置权限（假设用户为 lighthouse 和 docker 组，调整为您的实际用户/组）
+    chown -R lighthouse:docker $UPLOAD_DIR
+    chown -R lighthouse:docker $CONVERTED_DIR
+    chmod -R 775 $UPLOAD_DIR
+    chmod -R 775 $CONVERTED_DIR
+    
+    log_success "挂载目录准备完成（权限设置为775）"
+}
+
 # 一键构建和启动容器
 deploy_containers() {
     log_info "一键构建和启动容器..."
@@ -160,6 +181,7 @@ main() {
     
     check_docker
     check_network
+    prepare_directories  # 新增：准备目录和权限
     deploy_containers
     configure_nginx
     health_check
