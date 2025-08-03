@@ -1,0 +1,46 @@
+# 多阶段构建 - 构建阶段
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# 复制package文件
+COPY package*.json ./
+
+# 安装依赖
+RUN npm ci && npm cache clean --force
+
+# 复制源代码
+COPY . .
+
+# 构建React应用
+RUN npm run build
+
+# 生产阶段 - Nginx服务静态文件
+FROM nginx:alpine AS production
+
+# 复制构建产物到Nginx目录
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# 复制Nginx配置
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# 创建非root用户
+RUN addgroup -g 1001 -S nginx && \
+    adduser -S nginx -u 1001 -G nginx
+
+# 设置权限
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
+
+# 切换到非root用户
+USER nginx
+
+# 暴露端口
+EXPOSE 80
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
+
+# 启动Nginx
+CMD ["nginx", "-g", "daemon off;"] 

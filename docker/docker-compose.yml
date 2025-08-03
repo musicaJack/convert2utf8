@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
+      target: production
+    container_name: convert2utf8-frontend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    networks:
+      - geotracker_baidu_map_network
+    environment:
+      - NGINX_HOST=www.beingdigital.cn
+    volumes:
+      - frontend_logs:/var/log/nginx
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on: []
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.backend
+      target: production
+    container_name: convert2utf8-backend
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    networks:
+      - geotracker_baidu_map_network
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - CORS_ORIGIN=https://www.beingdigital.cn
+      - UPLOAD_DIR=/app/uploads
+      - CONVERTED_DIR=/app/converted
+      - LOG_LEVEL=info
+    volumes:
+      - ../backend/uploads:/app/uploads
+      - ../backend/converted:/app/converted
+      - backend_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on: []
+
+networks:
+  geotracker_baidu_map_network:
+    external: true
+
+volumes:
+  frontend_logs:
+  backend_logs: 

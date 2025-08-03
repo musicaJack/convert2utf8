@@ -1,0 +1,44 @@
+# 依赖目录
+node_modules
+npm-debug.log*
+
+# 构建输出
+dist
+build
+
+# 日志文件
+logs
+*.log
+
+# 运行时文件
+uploads/*
+converted/*
+!uploads/.gitkeep
+!converted/.gitkeep
+
+# 开发文件
+.git
+.gitignore
+README.md
+.env
+.env.local
+.env.development
+.env.test
+
+# IDE文件
+.vscode
+.idea
+*.swp
+*.swo
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 测试文件
+coverage
+.nyc_output
+
+# 临时文件
+tmp
+temp 
