@@ -7,8 +7,6 @@ services:
       dockerfile: docker/Dockerfile.frontend
       target: production
     container_name: convert2utf8-frontend
-    ports:
-      - "3000:3000"
     restart: unless-stopped
     networks:
       - geotracker_baidu_map_network
@@ -17,7 +15,7 @@ services:
     volumes:
       - frontend_logs:/var/log/nginx
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -30,8 +28,6 @@ services:
       dockerfile: ../docker/Dockerfile.backend
       target: production
     container_name: convert2utf8-backend
-    ports:
-      - "3001:3001"
     restart: unless-stopped
     networks:
       - geotracker_baidu_map_network
@@ -47,7 +43,7 @@ services:
       - ../backend/converted:/app/converted
       - backend_logs:/app/logs
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       interval: 30s
       timeout: 10s
       retries: 3
