@@ -11,6 +11,7 @@ yarn-error.log*
 lerna-debug.log*
 python.log
 flask.log
+*.log.*
 
 # Node.js dependencies
 node_modules/
@@ -255,3 +256,44 @@ coverage/
 yarn.lock
 pnpm-lock.yaml
 # Note: We keep package-lock.json for reproducible builds
+
+# Development and debugging files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.sublime-*
+.atom/
+
+# Windows specific
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS specific
+.AppleDouble
+.LSOverride
+Icon?
+
+# Linux specific
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# IDE and editor files (already covered above)
+# .vscode/
+# .idea/
+# *.swp
+# *.swo
+# *~
+# .DS_Store
+# Thumbs.db
+
+# Temporary files (already covered above)
+# *.tmp
+# *.temp
+# *.bak
+# *.backup
