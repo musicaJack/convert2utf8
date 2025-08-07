@@ -17,7 +17,9 @@
     "chardet": "^1.4.0",
     "socket.io": "^4.7.0",
     "uuid": "^9.0.0",
-    "fs-extra": "^11.1.0"
+    "fs-extra": "^11.1.0",
+    "axios": "^1.6.0",
+    "form-data": "^4.0.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.0",

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Convert2UTF8 生产环境部署脚本 (双容器架构)
+# Convert2UTF8 v2.0 生产环境部署脚本 (三容器架构)
 # 使用方法: ./scripts/deploy.sh
 
 set -e  # 遇到错误立即退出
@@ -75,7 +75,25 @@ prepare_directories() {
     chmod -R 775 $UPLOAD_DIR
     chmod -R 775 $CONVERTED_DIR
     
-    log_success "挂载目录准备完成（权限设置为775，组为996）"
+    log_success "后端挂载目录准备完成（权限设置为775，组为996）"
+    
+    log_info "准备EPUB服务挂载目录..."
+    
+    # EPUB服务目录路径
+    EPUB_UPLOAD_DIR="../epub-service/uploads"
+    EPUB_CONVERTED_DIR="../epub-service/converted"
+    
+    # 创建目录如果不存在
+    mkdir -p $EPUB_UPLOAD_DIR
+    mkdir -p $EPUB_CONVERTED_DIR
+    
+    # 设置权限
+    chown -R $(whoami):996 $EPUB_UPLOAD_DIR
+    chown -R $(whoami):996 $EPUB_CONVERTED_DIR
+    chmod -R 775 $EPUB_UPLOAD_DIR
+    chmod -R 775 $EPUB_CONVERTED_DIR
+    
+    log_success "EPUB服务挂载目录准备完成"
 }
 
 # 一键构建和启动容器
@@ -134,7 +152,7 @@ health_check() {
     log_info "执行健康检查..."
     
     # 检查容器健康状态
-    if docker ps | grep -q "convert2utf8-frontend" && docker ps | grep -q "convert2utf8-backend"; then
+    if docker ps | grep -q "convert2utf8-frontend" && docker ps | grep -q "convert2utf8-backend" && docker ps | grep -q "convert2utf8-epub-service"; then
         log_success "容器运行正常"
     else
         log_error "容器未正常运行"
@@ -156,6 +174,13 @@ health_check() {
     else
         log_warning "后端API健康检查失败，请手动检查"
     fi
+    
+    # 检查EPUB服务健康端点
+    if curl -f http://localhost:5000/health > /dev/null 2>&1; then
+        log_success "EPUB服务健康检查通过"
+    else
+        log_warning "EPUB服务健康检查失败，请手动检查"
+    fi
 }
 
 # 显示部署信息
@@ -163,11 +188,12 @@ show_deployment_info() {
     log_success "部署完成！"
     echo ""
     echo "=========================================="
-    echo "Convert2UTF8 双容器部署信息"
+    echo "Convert2UTF8 v2.0 三容器部署信息"
     echo "=========================================="
     echo "前端访问地址: https://www.beingdigital.cn/convert"
     echo "前端健康检查: http://localhost:3000/health"
     echo "后端API健康检查: http://localhost:3001/health"
+    echo "EPUB服务健康检查: http://localhost:5000/health"
     echo "容器状态: docker-compose ps (在docker目录下执行)"
     echo "查看日志: docker-compose logs (在docker目录下执行)"
     echo "=========================================="
@@ -176,7 +202,7 @@ show_deployment_info() {
 
 # 主函数
 main() {
-    echo "🚀 开始部署 Convert2UTF8 (双容器架构)..."
+    echo "🚀 开始部署 Convert2UTF8 v2.0 (三容器架构)..."
     echo ""
     
     check_docker

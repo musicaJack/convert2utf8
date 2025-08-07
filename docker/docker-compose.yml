@@ -38,6 +38,7 @@ services:
       - UPLOAD_DIR=/app/uploads
       - CONVERTED_DIR=/app/converted
       - LOG_LEVEL=info
+      - EPUB_SERVICE_URL=http://epub-service:5000
     volumes:
       - ../backend/uploads:/app/uploads
       - ../backend/converted:/app/converted
@@ -48,6 +49,33 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s  # 优化：确保容器有足够时间启动
+    depends_on:
+      - epub-service
+
+  epub-service:
+    build:
+      context: ../epub-service
+      dockerfile: ../docker/Dockerfile.epub-service
+      target: production
+    container_name: convert2utf8-epub-service
+    restart: unless-stopped
+    networks:
+      - geotracker_baidu_map_network
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+      - UPLOAD_FOLDER=/app/uploads
+      - CONVERTED_FOLDER=/app/converted
+    volumes:
+      - ../epub-service/uploads:/app/uploads
+      - ../epub-service/converted:/app/converted
+      - epub_service_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://127.0.0.1:5000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on: []
 
 networks:
@@ -56,4 +84,5 @@ networks:
 
 volumes:
   frontend_logs:
-  backend_logs: 
+  backend_logs:
+  epub_service_logs: 

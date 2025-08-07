@@ -1,17 +1,19 @@
-# Convert2UTF8 - 文件编码转换工具
+# Convert2UTF8 v2.0 - 文件编码转换工具
 
-一个基于Web的文件编码转换工具，支持将GB2312、UTF-16等编码的TXT文件转换为UTF-8格式。
+一个基于Web的文件编码转换工具，支持将GB2312、UTF-16等编码的TXT文件转换为UTF-8格式，同时新增EPUB电子书转换功能。
 
 ## 🚀 项目特性
 
 - **文件上传**：支持拖拽上传和文件选择
 - **编码检测**：自动检测文件编码格式
 - **编码转换**：GB2312/UTF-16 → UTF-8
+- **EPUB转换**：EPUB电子书转换为TXT文本文件
 - **批量处理**：支持批量文件转换
 - **实时进度**：显示转换进度
 - **文件下载**：转换后文件自动下载
+- **文件预览**：支持转换后文件内容预览
 - **现代化UI**：基于Ant Design的美观界面
-- **容器化部署**：支持Docker双容器架构部署
+- **容器化部署**：支持Docker三容器架构部署
 
 ## 📁 项目结构
 
@@ -45,9 +47,17 @@ convert2utf8/
 │   ├── package.json        # 后端依赖配置
 │   ├── tsconfig.json       # TypeScript配置
 │   └── nodemon.json        # 开发环境配置
+├── epub-service/            # Python EPUB转换服务
+│   ├── services/           # EPUB转换服务
+│   ├── uploads/            # EPUB文件上传存储
+│   ├── converted/          # EPUB转换后文件存储
+│   ├── app.py              # Flask应用入口
+│   ├── requirements.txt    # Python依赖配置
+│   └── test_converter.py   # EPUB转换测试
 ├── docker/                  # Docker容器配置
 │   ├── Dockerfile.frontend # 前端容器构建
 │   ├── Dockerfile.backend  # 后端容器构建
+│   ├── Dockerfile.epub-service # EPUB服务容器构建
 │   ├── docker-compose.yml  # 容器编排配置
 │   ├── nginx.conf          # 前端容器Nginx配置
 │   └── .dockerignore       # Docker忽略文件
@@ -57,7 +67,8 @@ convert2utf8/
 ├── scripts/                 # 部署脚本
 │   ├── deploy.sh           # 主部署脚本
 │   ├── build-frontend.sh   # 前端构建脚本
-│   └── build-backend.sh    # 后端构建脚本
+│   ├── build-backend.sh    # 后端构建脚本
+│   └── build-epub-service.sh # EPUB服务构建脚本
 ├── config/                  # 配置文件
 │   ├── env.production      # 生产环境变量
 │   └── env.example         # 环境变量示例
@@ -88,10 +99,18 @@ convert2utf8/
 - **chardet** - 编码检测库
 - **Socket.io** - WebSocket支持
 
+### EPUB服务
+- **Python 3.11** - 运行环境
+- **Flask** - Web框架
+- **ebooklib** - EPUB文件处理库
+- **BeautifulSoup4** - HTML解析
+- **chardet** - 编码检测
+
 ### 部署
 - **Docker** - 容器化部署
 - **Docker Compose** - 容器编排
 - **Nginx** - 反向代理和静态文件服务
+- **多容器架构** - 前端、后端、EPUB服务独立部署
 
 ## 🚀 快速部署
 

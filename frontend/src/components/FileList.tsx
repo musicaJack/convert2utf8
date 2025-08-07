@@ -14,10 +14,11 @@ import {
   DownloadOutlined, 
   DeleteOutlined, 
   ReloadOutlined,
-  FileTextOutlined 
+  FileTextOutlined,
+  EyeOutlined
 } from '@ant-design/icons';
 import { FileInfo, ConvertProgress } from '../types';
-import { convertFiles, getConvertProgress, downloadFile, deleteFile } from '../services/api';
+import { convertFiles, getConvertProgress, downloadFile, deleteFile, downloadEpubFile, previewEpubFile, convertEpubFiles } from '../services/api';
 import './FileList.css';
 
 const { Text } = Typography;
@@ -32,6 +33,9 @@ const FileList: React.FC<FileListProps> = ({ files, onFilesChange }) => {
   const [converting, setConverting] = useState(false);
   const [conversionProgress, setConversionProgress] = useState<ConvertProgress | null>(null);
   const [progressModalVisible, setProgressModalVisible] = useState(false);
+  const [previewModalVisible, setPreviewModalVisible] = useState(false);
+  const [previewContent, setPreviewContent] = useState<string>('');
+  const [previewFileName, setPreviewFileName] = useState<string>('');
 
   // 全选状态
   const allSelected = files.length > 0 && selectedFileIds.length === files.length;
@@ -66,18 +70,71 @@ const FileList: React.FC<FileListProps> = ({ files, onFilesChange }) => {
       setConverting(true);
       setProgressModalVisible(true);
 
-      const response = await convertFiles(selectedFileIds);
-      
-      if (response.success) {
-        message.success(`开始转换 ${selectedFileIds.length} 个文件`);
-        
-        // 开始轮询转换进度
-        pollConversionProgress(response.taskId);
-      } else {
-        message.error(response.error || '转换失败');
+      // 分离TXT文件和EPUB文件
+      const selectedFiles = files.filter(file => selectedFileIds.includes(file.id));
+      const txtFiles = selectedFiles.filter(file => file.name.toLowerCase().endsWith('.txt'));
+      const epubFiles = selectedFiles.filter(file => file.name.toLowerCase().endsWith('.epub'));
+
+      let allSuccess = true;
+      let errorMessage = '';
+
+      // 处理TXT文件转换
+      if (txtFiles.length > 0) {
+        const txtFileIds = txtFiles.map(file => file.id);
+        try {
+          const response = await convertFiles(txtFileIds);
+          if (response.success) {
+            message.success(`开始转换 ${txtFileIds.length} 个TXT文件`);
+            // 开始轮询转换进度
+            pollConversionProgress(response.taskId);
+          } else {
+            allSuccess = false;
+            errorMessage += `TXT文件转换失败: ${response.error}; `;
+          }
+        } catch (error) {
+          allSuccess = false;
+          errorMessage += 'TXT文件转换请求失败; ';
+        }
+      }
+
+      // 处理EPUB文件转换
+      if (epubFiles.length > 0) {
+        const epubFileIds = epubFiles.map(file => file.id);
+        try {
+          const response = await convertEpubFiles(epubFileIds);
+          if (response.success) {
+            message.success(`EPUB文件转换完成: ${epubFileIds.length} 个文件`);
+            
+            // 更新文件状态
+            const updatedFiles: FileInfo[] = files.map(file => {
+              if (epubFileIds.includes(file.id)) {
+                return { ...file, status: 'converted' as const };
+              }
+              return file;
+            });
+            onFilesChange(updatedFiles);
+          } else {
+            allSuccess = false;
+            errorMessage += `EPUB文件转换失败: ${response.error}; `;
+          }
+        } catch (error) {
+          allSuccess = false;
+          errorMessage += 'EPUB文件转换请求失败; ';
+        }
+      }
+
+      if (!allSuccess) {
+        message.error(errorMessage);
         setConverting(false);
         setProgressModalVisible(false);
       }
+
+      // 如果没有TXT文件需要轮询进度，直接完成
+      if (txtFiles.length === 0) {
+        setConverting(false);
+        setProgressModalVisible(false);
+      }
+
     } catch (error) {
       console.error('转换错误:', error);
       message.error('转换请求失败');
@@ -127,7 +184,10 @@ const FileList: React.FC<FileListProps> = ({ files, onFilesChange }) => {
   const handleDownload = async (file: FileInfo) => {
     try {
       console.log('开始下载文件:', file.id, file.name);
-      const blob = await downloadFile(file.id);
+      
+      // 判断文件类型，选择不同的下载API
+      const isEpubFile = file.type === 'application/epub+zip' || file.name.toLowerCase().endsWith('.epub');
+      const blob = isEpubFile ? await downloadEpubFile(file.id) : await downloadFile(file.id);
       
       console.log('下载的blob:', blob);
       
@@ -140,16 +200,50 @@ const FileList: React.FC<FileListProps> = ({ files, onFilesChange }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = file.name;
+      
+      // EPUB文件下载转换后的TXT文件
+      if (isEpubFile) {
+        const fileName = file.name.replace(/\.epub$/i, '.txt');
+        link.download = fileName;
+      } else {
+        link.download = file.name;
+      }
+      
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
       
-      message.success('文件下载成功');
+      const successMessage = isEpubFile ? 'EPUB转换文件下载成功' : '文件下载成功';
+      message.success(successMessage);
     } catch (error) {
       console.error('下载错误:', error);
       message.error(`文件下载失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    }
+  };
+
+  // 预览文件
+  const handlePreview = async (file: FileInfo) => {
+    try {
+      const isEpubFile = file.type === 'application/epub+zip' || file.name.toLowerCase().endsWith('.epub');
+      
+      if (isEpubFile) {
+        // EPUB文件预览转换后的内容
+        const response = await previewEpubFile(file.id);
+        setPreviewContent(response.preview);
+        setPreviewFileName(file.name.replace(/\.epub$/i, '.txt'));
+      } else {
+        // TXT文件直接下载并预览
+        const blob = await downloadFile(file.id);
+        const text = await blob.text();
+        setPreviewContent(text);
+        setPreviewFileName(file.name);
+      }
+      
+      setPreviewModalVisible(true);
+    } catch (error) {
+      console.error('预览错误:', error);
+      message.error(`文件预览失败: ${error instanceof Error ? error.message : '未知错误'}`);
     }
   };
 
@@ -254,9 +348,19 @@ const FileList: React.FC<FileListProps> = ({ files, onFilesChange }) => {
     {
       title: '操作',
       key: 'actions',
-      width: 150,
+      width: 200,
       render: (_: any, file: FileInfo) => (
         <Space>
+          {(file.status === 'converted' || file.status === 'uploaded') && (
+            <Button
+              type="text"
+              size="small"
+              icon={<EyeOutlined />}
+              onClick={() => handlePreview(file)}
+            >
+              预览
+            </Button>
+          )}
           {file.status === 'converted' && (
             <Button
               type="primary"
@@ -355,6 +459,33 @@ const FileList: React.FC<FileListProps> = ({ files, onFilesChange }) => {
             )}
           </div>
         )}
+      </Modal>
+
+      {/* 文件预览模态框 */}
+      <Modal
+        title={`文件预览 - ${previewFileName}`}
+        open={previewModalVisible}
+        footer={null}
+        width={800}
+        onCancel={() => setPreviewModalVisible(false)}
+      >
+        <div className="file-preview">
+          <div className="preview-content">
+            <pre style={{ 
+              maxHeight: '500px', 
+              overflow: 'auto', 
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              fontSize: '14px',
+              lineHeight: '1.6',
+              padding: '16px',
+              backgroundColor: '#f5f5f5',
+              borderRadius: '4px'
+            }}>
+              {previewContent}
+            </pre>
+          </div>
+        </div>
       </Modal>
     </div>
   );

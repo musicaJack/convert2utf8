@@ -4,6 +4,7 @@ import path from 'path';
 import upload, { handleUploadError } from './middleware/upload';
 import { uploadFile, getFiles, deleteFile } from './controllers/uploadController';
 import { convertFiles, getConvertProgress, downloadFile } from './controllers/convertController';
+import { epubUpload, epubConvert, epubDownload, epubPreview } from './controllers/epubController';
 
 const app = express();
 
@@ -42,6 +43,12 @@ app.delete('/api/files/:fileId', deleteFile);
 app.post('/api/convert', convertFiles);
 app.get('/api/convert/:taskId/progress', getConvertProgress);
 app.get('/api/download/:fileId', downloadFile);
+
+// EPUB微服务代理路由
+app.post('/api/epub/upload', epubUpload);
+app.post('/api/epub/convert', epubConvert);
+app.get('/api/epub/download/:fileId', epubDownload);
+app.get('/api/epub/preview/:fileId', epubPreview);
 
 // 文件上传错误处理
 app.use('/api/upload', handleUploadError);

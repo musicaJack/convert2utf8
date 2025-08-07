@@ -10,7 +10,8 @@ import {
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: '/convert/api',  // 修复：改为 '/convert/api' 以匹配代理路径（原为 '/api'）
+  baseURL: '/convert/api',  // 生产配置
+  //baseURL: 'http://localhost:3001/api',  // 直接访问后端服务 测试配置
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -61,7 +62,7 @@ export const uploadFile = async (file: File): Promise<UploadResponse> => {
 // 获取文件列表
 export const getFiles = async (): Promise<FileInfo[]> => {
   const response = await api.get<FileInfo[]>('/files');
-  return response as any;
+  return response as unknown as FileInfo[];
 };
 
 // 批量转换文件
@@ -88,6 +89,40 @@ export const downloadFile = async (fileId: string): Promise<Blob> => {
 // 删除文件
 export const deleteFile = async (fileId: string): Promise<void> => {
   await api.delete(`/files/${fileId}`);
+};
+
+// EPUB文件上传（只保存，不转换）
+export const uploadEpubFile = async (file: File): Promise<UploadResponse> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const response = await api.post<UploadResponse>('/epub/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  
+  return response as any;
+};
+
+// EPUB文件转换
+export const convertEpubFiles = async (fileIds: string[]): Promise<any> => {
+  const response = await api.post('/epub/convert', { fileIds });
+  return response as any;
+};
+
+// 下载EPUB转换后的文件
+export const downloadEpubFile = async (fileId: string): Promise<Blob> => {
+  const response = await api.get(`/epub/download/${fileId}`, {
+    responseType: 'blob',
+  });
+  return response as any;
+};
+
+// 预览EPUB转换后的文件内容
+export const previewEpubFile = async (fileId: string): Promise<{ preview: string }> => {
+  const response = await api.get<{ preview: string }>(`/epub/preview/${fileId}`);
+  return response as any;
 };
 
 export default api; 
