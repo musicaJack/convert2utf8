@@ -222,4 +222,6 @@ def preview_file(file_id):
 
 if __name__ == '__main__':
     from datetime import datetime
-    app.run(debug=True, host='0.0.0.0', port=5001) 
+    # 生产环境应该设置为 False
+    debug_mode = os.environ.get('FLASK_ENV') == 'development'
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000) 
