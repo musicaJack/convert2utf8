@@ -8,10 +8,16 @@ import {
   ApiError 
 } from '../types';
 
+// 基地址自动适配：优先使用构建时环境变量，其次根据主机名回退
+const apiBaseUrl =
+  (process.env.REACT_APP_API_BASE as string) ||
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:3001/api'
+    : '/convert/api');
+
 // 创建axios实例
 const api = axios.create({
-  baseURL: '/convert/api',  // 生产配置
-  //baseURL: 'http://localhost:3001/api',  // 直接访问后端服务 测试配置
+  baseURL: apiBaseUrl,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
