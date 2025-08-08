@@ -26,10 +26,10 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCa
     return cb(new Error('只支持上传 .txt 文件'));
   }
 
-  // 检查文件大小 (5MB)
-  const maxSize = 5 * 1024 * 1024;
+  // 检查文件大小 (50MB)
+  const maxSize = 50 * 1024 * 1024;
   if (file.size && file.size > maxSize) {
-    return cb(new Error('文件大小不能超过 5MB'));
+    return cb(new Error('文件大小不能超过 50MB'));
   }
 
   cb(null, true);
@@ -40,7 +40,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 50 * 1024 * 1024, // 50MB
     files: 10, // 最多10个文件
   }
 });

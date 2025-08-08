@@ -9,7 +9,7 @@ import { fileStore } from '../services/fileStore';
 
 // 上传配置
 const uploadConfig = {
-  maxFileSize: 5 * 1024 * 1024, // 5MB
+  maxFileSize: 50 * 1024 * 1024, // 50MB
   allowedExtensions: ['.txt'],
   uploadDir: path.join(__dirname, '../../uploads'),
   convertedDir: path.join(__dirname, '../../converted'),

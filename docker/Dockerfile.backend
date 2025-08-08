@@ -45,8 +45,7 @@ RUN mkdir -p uploads converted logs && \
     chown -R nodejs:nodejs uploads converted logs && \
     chmod -R 775 uploads converted logs  # 确保 group writable
 
-# 切换到非root用户
-USER nodejs
+# 默认以root运行，避免宿主机挂载卷权限不匹配导致写入失败
 
 # 暴露端口
 EXPOSE 3001
