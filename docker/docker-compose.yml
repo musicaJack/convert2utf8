@@ -38,7 +38,7 @@ services:
       - UPLOAD_DIR=/app/uploads
       - CONVERTED_DIR=/app/converted
       - LOG_LEVEL=info
-      - EPUB_SERVICE_URL=http://epub-service:5000
+      - EPUB_SERVICE_URL=http://epub-service:5001
     volumes:
       - ../backend/uploads:/app/uploads
       - ../backend/converted:/app/converted
@@ -71,7 +71,7 @@ services:
       - ../epub-service/converted:/app/converted
       - epub_service_logs:/app/logs
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://127.0.0.1:5000/health')"]
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://127.0.0.1:5001/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
