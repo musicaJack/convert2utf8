@@ -39,7 +39,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple \
     PIP_TRUSTED_HOST=pypi.tuna.tsinghua.edu.cn
 
-# 创建非root用户
+# 可选：创建非root用户（当前镜像默认以root运行，避免卷权限问题）
 RUN groupadd -r epubuser && useradd -r -g epubuser epubuser
 
 WORKDIR /app
@@ -71,8 +71,7 @@ RUN mkdir -p uploads converted logs && \
     chown -R epubuser:epubuser uploads converted logs && \
     chmod -R 775 uploads converted logs
 
-# 切换到非root用户
-USER epubuser
+# 默认以root运行，确保可写入挂载卷 /app/uploads 与 /app/converted
 
 # 暴露端口（与应用一致 5001）
 EXPOSE 5001
